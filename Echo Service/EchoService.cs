@@ -5,35 +5,37 @@ namespace Echo_Service;
 public class EchoService
 {
     private IState _state; 
-    public IInput input; 
-    public IOutput output;
+    public IInput Input {get; set;}
+    public IOutput Output{get; set;}
+    private ITokenSink _sinks; 
 
-    public EchoService(IInput input, IOutput output)
+    public EchoService(IInput input, IOutput output, ITokenSink sinks)
     {
         _state = new AuthenticatorState(); 
-        this.input = input;
-        this.output = output;
+        this.Input = input;
+        this.Output = output;
+        this._sinks = sinks;
     }
 
     public void StartEchoService()
     {
-        output.Write("Echo Service", true);
+        Output.Write("Echo Service", true);
         while (_state is not ExitState)
         {
             switch (_state)
             {
                 case AuthenticatorState authenticatorState:
-                    output.Write("User>", false);
+                    Output.Write("User>", false);
                     break;
                 case EchoState echoState:
-                    output.Write("Echo>", false);
+                    Output.Write("Echo>", false);
                     break;
                 case ExitState exitState:
-                    output.Write("Exit Program", false);
+                    Output.Write("Exit Program", false);
                     break;
             }
 
-            string inputText = input.Read();
+            string inputText = Input.Read();
             switch (inputText)
             {
                 case "exit":
@@ -43,7 +45,7 @@ public class EchoService
                     _state = new AuthenticatorState();
                     break;
                 default:
-                    _state = _state.Handle(inputText, input, output);
+                    _state = _state.Handle(inputText, this);
                     break;
             }
         }

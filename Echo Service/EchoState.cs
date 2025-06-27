@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 public class EchoState : IState
 {
-    public IState Handle(string inputString, IInput input, IOutput output)
+    public IState Handle(string inputString,EchoService echoService)
     {
+        IOutput output = echoService.Output;
         output.Write( inputString, true);
         return this; 
     }
@@ -14,8 +15,10 @@ public class EchoState : IState
 
 public class AuthenticatorState : IState
 {
-    public IState Handle(string inputString, IInput input, IOutput output)
+    public IState Handle(string inputString,EchoService echoService)
     {
+        IOutput output = echoService.Output;
+        IInput input = echoService.Input;
         Authenticator authenticator = new Authenticator();
         if (authenticator.CheckUserName(inputString))
         {
@@ -33,7 +36,7 @@ public class AuthenticatorState : IState
 
 public class ExitState : IState
 {
-    public IState Handle(string inputText, IInput input, IOutput output)
+    public IState Handle(string inputText,EchoService echoService)
     {
         return this; 
     }

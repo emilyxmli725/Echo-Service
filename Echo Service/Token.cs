@@ -1,14 +1,16 @@
 ﻿namespace Echo_Service;
 
+public enum TokenType
+{
+    Identifier,
+    Number,
+    Operator,
+    LeftParenthesis,
+    RightParenthesis
+}
 public class Token
 {
-    public enum TokenType
-    {
-        Identifier,
-        Number,
-        Operator,
-        Unkown
-    }
+
     public TokenType Type { get; set; }
     public string TokenText { get; set; }
 

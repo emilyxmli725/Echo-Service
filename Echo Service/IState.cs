@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 public interface IState
 {
-    IState Handle(string inputText, IInput input,IOutput output); 
+    IState Handle(string inputText, EchoService echoService); 
 
 }
 

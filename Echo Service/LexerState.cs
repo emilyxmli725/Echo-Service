@@ -2,8 +2,8 @@
 
 public class LexerState :IState
 {
-
-    public IState Handle(string inputText, IInput input, IOutput output)
+   
+    public IState Handle(string inputText,EchoService echoService)
     {
         return null;
     }

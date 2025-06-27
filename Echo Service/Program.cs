@@ -9,7 +9,8 @@ class Program
     {
         ConsoleInput input = new ConsoleInput();
         ConsoleOutput output = new ConsoleOutput();
-        EchoService echoService = new EchoService(input, output);
+        PrintTokenSink printTokens = new PrintTokenSink();
+        EchoService echoService = new EchoService(input, output,printTokens);
         echoService.StartEchoService();
     }
 }
