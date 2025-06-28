@@ -33,6 +33,9 @@ public class EchoService
                 case ExitState exitState:
                     Output.Write("Exit Program", false);
                     break;
+                case LexerState lexerState:
+                    Output.Write("Token>", false);
+                    break;
             }
 
             string inputText = Input.Read();

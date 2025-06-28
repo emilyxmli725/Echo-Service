@@ -2,5 +2,6 @@
 
 public interface ITokenSink
 {
-    void Accept(Token token, EchoService echoService);
+    void Accept(Token token);
+    List<Token> GetTokens(EchoService echoService);
 }
