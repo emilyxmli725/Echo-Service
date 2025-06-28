@@ -14,8 +14,14 @@ public class PrintTokenSink : ITokenSink
         foreach (var token in _tokens)
         {
             IOutput output = echoService.Output;
+            output.Write(token.TokenText, true);
         }
         return _tokens;
+    }
+
+    public void ClearTokens()
+    {
+        _tokens.Clear();
     }
 }
 

@@ -19,7 +19,32 @@ public class LexerState :IState
     
     public IState Handle(string inputText,EchoService echoService)
     {
-        return null;
+        List<Token> tokens = Tokenize(inputText, echoService);
+        if (null ==tokens)
+        {
+            return this;
+        }
+        foreach (var token in tokens)
+        {
+
+            foreach (var sink in _tokenSinks)
+            {
+                sink.Accept(token);
+            }
+        }
+        foreach (var sink in _tokenSinks)
+        {
+       
+                sink.GetTokens(echoService);
+           
+        }
+
+        foreach (var sink in _tokenSinks)
+        {
+            sink.ClearTokens();
+        }
+
+        return this; 
     }
 
     private List<Token> Tokenize(string inputText, EchoService echoService)
@@ -30,45 +55,63 @@ public class LexerState :IState
         ExpectedToken currentExpected = ExpectedToken.ExpectingOperand; 
         while (i < inputText.Length)
         {
-            char c = inputText[i];
+            
             Token token = null;
-            if (currentExpected == ExpectedToken.ExpectingOperator)
+            if (currentExpected == ExpectedToken.ExpectingOperand)
             {
-                if(IsWhitespace(c))
+                if(IsWhitespace(inputText[i]))
                 {
                     i++;
                     continue;
                 }
 
-                if (IsNumber(c))
+                if (IsNumber(inputText[i]))
                 {
                     int start = i;
-                    while (i < inputText.Length && IsNumber(c))
+                    while (i < inputText.Length && IsNumber(inputText[i]))
                     {
                         i++;
                     }
                     string value = inputText.Substring(start, i - start);
-                    token = (new Token(TokenType.Number, value, start));
+                    token = new Token(TokenType.Number, value, start);
+                    tokens.Add(token);        
                     currentExpected = ExpectedToken.ExpectingOperator;
+                    continue;
                 }
-                else if (IsIdentifier(c))
+                else if (IsIdentifier(inputText[i]))
                 {
                     int start = i;
-                    while (i < inputText.Length && IsIdentifier(c) || IsNumber(c))
+                    while (i < inputText.Length && (IsIdentifier(inputText[i]) || IsNumber(inputText[i])))
                     {
                         i++;
                     }
                     string value = inputText.Substring(start, i - start);
                     token = (new Token(TokenType.Identifier, value, start));
+                    tokens.Add(token);  
                     currentExpected = ExpectedToken.ExpectingOperator;
+                    continue;
                     
                 }
-                else if ('(' == c)
+                else if ('(' == inputText[i])
                 {
                     token = (new Token(TokenType.LeftParenthesis, inputText.Substring(i, 1), i));
                     parenthesisCounter++;
                 }
-                else if ('+' == c || '-' == c)
+                else if (')' == inputText[i])
+                {
+                    if (parenthesisCounter >= 0)
+                    {
+                        token = (new Token(TokenType.RightParenthesis, inputText.Substring(i, 1), i));
+                        parenthesisCounter--;
+                    }
+                    else
+                    {
+                        echoService.Output.Write("Error: Too many closing brackets at position" + i, true);
+                        currentExpected = ExpectedToken.Error;
+                    }
+                    
+                }
+                else if ('+' == inputText[i] || '-' == inputText[i])
                 {
                     token = (new Token(TokenType.Operator, inputText.Substring(i, 1), i));
                 }
@@ -78,15 +121,15 @@ public class LexerState :IState
                     currentExpected = ExpectedToken.Error;
                 }
             }
-            if (currentExpected == ExpectedToken.ExpectingOperator)
+            else if (currentExpected == ExpectedToken.ExpectingOperator)
             {
-                if (IsOperator(c))
+                if (IsOperator(inputText[i]))
                 {
                     token = (new Token(TokenType.Operator, inputText.Substring(i, 1), i));
                     currentExpected = ExpectedToken.ExpectingOperand;
                 }
                
-                else if (')' == c)
+                else if (')' == inputText[i])
                 {
                     if (parenthesisCounter >= 0)
                     {
@@ -111,7 +154,7 @@ public class LexerState :IState
                 break;
             }
             tokens.Add(token);
-            i++;
+            i++; 
         }
         
         return currentExpected == ExpectedToken.Error ? null : tokens;
@@ -129,7 +172,7 @@ public class LexerState :IState
 
     private bool IsIdentifier(char c)
     {
-        return c >= 'a' || c <= 'z' || c >= 'A' || c <= 'Z';
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
     private bool IsOperator(char c)

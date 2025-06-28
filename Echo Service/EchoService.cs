@@ -7,11 +7,11 @@ public class EchoService
     private IState _state; 
     public IInput Input {get; set;}
     public IOutput Output{get; set;}
-    private ITokenSink _sinks; 
+    private List<ITokenSink> _sinks; 
 
-    public EchoService(IInput input, IOutput output, ITokenSink sinks)
+    public EchoService(IState startingState, IInput input, IOutput output, List<ITokenSink> sinks)
     {
-        _state = new AuthenticatorState(); 
+        _state = startingState; 
         this.Input = input;
         this.Output = output;
         this._sinks = sinks;
@@ -46,6 +46,12 @@ public class EchoService
                     break;
                 case "logout":
                     _state = new AuthenticatorState();
+                    break;
+                case "token":
+                    _state = new LexerState(_sinks);
+                    break;
+                case "echo":
+                    _state = new EchoState();
                     break;
                 default:
                     _state = _state.Handle(inputText, this);

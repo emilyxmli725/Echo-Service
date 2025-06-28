@@ -10,7 +10,13 @@ class Program
         ConsoleInput input = new ConsoleInput();
         ConsoleOutput output = new ConsoleOutput();
         PrintTokenSink printTokens = new PrintTokenSink();
-        EchoService echoService = new EchoService(input, output,printTokens);
+        PostFixSink postFix = new PostFixSink();
+        List<ITokenSink> tokenSinks = new List<ITokenSink>();
+        tokenSinks.Add(printTokens);
+        tokenSinks.Add(postFix);
+        LexerState start = new LexerState(tokenSinks);
+  
+        EchoService echoService = new EchoService(start, input, output,tokenSinks);
         echoService.StartEchoService();
     }
 }
