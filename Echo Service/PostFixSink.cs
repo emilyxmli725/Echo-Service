@@ -52,17 +52,19 @@ public class PostFixSink : ITokenSink
     public List<Token> GetTokens(EchoService echoService)
     {
         IOutput output = echoService.Output;
-        output.Write("PostFix List:" ,true);
+        /*output.Write("PostFix List:" ,true);*/
         while (_operatorStack.Count > 0)
         {
             _tokens.Add(_operatorStack.Pop());
         }
 
+        /*
         foreach (var token in _tokens)
         {
             output.Write(token.TokenText + " ", false);
             output.Write( " ", true);
         }
+        */
         
         return _tokens;
     }
