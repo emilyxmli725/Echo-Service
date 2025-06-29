@@ -15,9 +15,9 @@ class Program
         List<ITokenSink> tokenSinks = new List<ITokenSink>();
         
         tokenSinks.Add(printTokens);
-        tokenSinks.Add(postFix);
+        //tokenSinks.Add(postFix);
         tokenSinks.Add(calculateSink);
-        LexerState start = new LexerState(tokenSinks);
+        AuthenticatorState start = new AuthenticatorState();
   
         EchoService echoService = new EchoService(start, input, output,tokenSinks);
         echoService.StartEchoService();
