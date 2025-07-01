@@ -17,10 +17,9 @@ class Program
         tokenSinks.Add(printTokens);
         //tokenSinks.Add(postFix);
         tokenSinks.Add(calculateSink);
-        AuthenticatorState start = new AuthenticatorState();
-  
-        EchoService echoService = new EchoService(start, input, output,tokenSinks);
-        echoService.StartEchoService();
+        EchoService echoService = new EchoService(input, output, tokenSinks);
+        echoService.InitService();
+        echoService.StartService();
     }
 }
 

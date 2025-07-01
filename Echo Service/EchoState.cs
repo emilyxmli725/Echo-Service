@@ -11,25 +11,32 @@ public class EchoState : IState
         output.Write( inputString, true);
         return this; 
     }
+
+    public string GetPrompt()
+    {
+        return "Echo"; 
+    }
 }
 
 public class AuthenticatorState : IState
 {
+    private string _username;
     public IState Handle(string inputString,EchoService echoService)
     {
         IOutput output = echoService.Output;
-        IInput input = echoService.Input;
-        Authenticator authenticator = new Authenticator();
-        if (authenticator.CheckUserName(inputString))
+
+    }
+
+    public string GetPrompt()
+    {
+        if (_username == null)
         {
-            output.Write("Password>",false);
-            string inputPassword = input.Read();
-            if (authenticator.CheckPassword(inputString, inputPassword))
-            {
-                return new EchoState();
-            }
+            return "User";
         }
-        return this; 
+        else
+        {
+            return "Pwd"; 
+        }
     }
 }
 
@@ -39,5 +46,10 @@ public class ExitState : IState
     public IState Handle(string inputText,EchoService echoService)
     {
         return this; 
+    }
+
+    public string GetPrompt()
+    {
+        return "Exit";
     }
 }

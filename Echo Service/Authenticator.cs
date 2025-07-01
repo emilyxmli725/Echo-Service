@@ -2,12 +2,10 @@
 
 public class Authenticator
 {
-    private Dictionary<string, string> _users = new Dictionary<string, string>();
-
+    private Dictionary<string, string> _users;
     public Authenticator()
     {
-        _users.Add("user1", "password1");
-        _users.Add("user2", "password2");
+     _users = new Dictionary<string, string>();
     }
 
     public void AddUser(string username, string password)

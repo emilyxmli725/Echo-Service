@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Echo Service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1eda2d5804dc6d18ce290f4d487b4da38b88bae2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+52dac3a2fe210b87b33b1dbf0cf516b3a9f89fc3")]
 [assembly: System.Reflection.AssemblyProductAttribute("Echo Service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Echo Service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 public interface IState
 {
-    IState Handle(string inputText, EchoService echoService); 
+    void Handle(string inputText, EchoService echoService);
+    string GetPrompt(); 
 
 }
 

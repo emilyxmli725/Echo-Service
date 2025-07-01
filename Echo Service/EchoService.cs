@@ -2,59 +2,74 @@
 
 namespace Echo_Service;
 
-public class EchoService
+public class EchoService:IService
 {
-    private IState _state; 
-    public IInput Input {get; set;}
-    public IOutput Output{get; set;}
+    public enum States
+    {
+        AUTH,
+        ECHO, 
+        TOKEN, 
+        EXIT
+        
+    }
+
+    private Dictionary<States, IState> _states;
+    private IState _currentState; 
+    public IInput Input {get;}
+    public IOutput Output{get;}
     private List<ITokenSink> _sinks; 
 
-    public EchoService(IState startingState, IInput input, IOutput output, List<ITokenSink> sinks)
+    public void InitService()
     {
-        _state = startingState; 
+        Authenticator authenticator = new Authenticator();
+        authenticator.AddUser("user1", "password1");
+        authenticator.AddUser("user2", "password2");
+        _currentState =_states[States.AUTH];
+    }
+
+    
+    public EchoService( IInput input, IOutput output, List<ITokenSink> sinks) 
+    {
         this.Input = input;
         this.Output = output;
         this._sinks = sinks;
+        this._states = new Dictionary<States, IState>();
+    }
+  public void InitStates()
+    {
+        _states.Add(States.AUTH, new AuthenticatorState());
+        _states.Add(States.ECHO, new EchoState());
+        _states.Add(States.TOKEN, new LexerState(_sinks));
+        _states.Add(States.EXIT, new ExitState());
     }
 
-    public void StartEchoService()
+    private void PrintPrompt(IState state)
+    {
+        Output.Write(state.GetPrompt(), false);
+    }
+    public void StartService()
     {
         Output.Write("Echo Service", true);
-        while (_state is not ExitState)
-        {
-            switch (_state)
-            {
-                case AuthenticatorState authenticatorState:
-                    Output.Write("User>", false);
-                    break;
-                case EchoState echoState:
-                    Output.Write("Echo>", false);
-                    break;
-                case ExitState exitState:
-                    Output.Write("Exit Program", false);
-                    break;
-                case LexerState lexerState:
-                    Output.Write("Token>", false);
-                    break;
-            }
-
+        while (_currentState is not ExitState)
+        {   
+           PrintPrompt(_currentState);
             string inputText = Input.Read();
             switch (inputText)
             {
                 case "exit":
-                    _state = new ExitState();
+                    _currentState = new ExitState();
                     break;
                 case "logout":
-                    _state = new AuthenticatorState();
+                    _currentState = new AuthenticatorState();
                     break;
                 case "token":
-                    _state = new LexerState(_sinks);
+                    _currentState = new LexerState(_sinks);
                     break;
                 case "echo":
-                    _state = new EchoState();
+                    _currentState = new EchoState();
                     break;
                 default:
-                    _state = _state.Handle(inputText, this);
+                    _currentState = _currentState.Handle(inputText, this);
                     break;
             }
         }

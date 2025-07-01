@@ -47,6 +47,11 @@ public class LexerState :IState
         return this; 
     }
 
+    public string GetPrompt()
+    {
+        return "Token";
+    }
+
     private List<Token> Tokenize(string inputText, EchoService echoService)
     {
         List<Token> tokens = new List<Token>();
