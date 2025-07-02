@@ -13,10 +13,12 @@ public class CalculateSink : ITokenSink
     public void Accept(Token token)
     {
         _tokens.Add(token);
+        _postFixSink.Accept(token);
     }
 
     public void ClearTokens()
     {
+        _postFixSink.ClearTokens();
         _tokens.Clear();
     }
 
@@ -52,22 +54,22 @@ public class CalculateSink : ITokenSink
                         throw new Exception("not enough operands");
                     }
 
-                    double opOne = postFixStack.Pop();
-                    double opTwo = postFixStack.Pop();
+                    double right = postFixStack.Pop();
+                    double left = postFixStack.Pop();
                     double result = 0;
                     switch (token.TokenText)
                     {
-                        case "+": result = opOne + opTwo; break;
-                        case "-": result = opOne - opTwo; break;
-                        case "*": result = opOne * opTwo; break;
+                        case "+": result = left + right; break;
+                        case "-": result = left - right; break;
+                        case "*": result = left * right; break;
                         case "/":
                         {
-                            if (opTwo == 0)
+                            if (left == 0)
                             {
                                 throw new DivideByZeroException();
                             }
 
-                            result = opOne / opTwo;
+                            result = left / right;
                             break;
                         }
                     }

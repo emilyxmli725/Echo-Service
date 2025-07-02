@@ -4,27 +4,25 @@ namespace Echo_Service;
 
 public class EchoService:IService
 {
-    public enum States
-    {
-        AUTH,
-        ECHO, 
-        TOKEN, 
-        EXIT
-        
-    }
 
-    private Dictionary<States, IState> _states;
-    private IState _currentState; 
+    private Dictionary<IService.States, IState> _states;
+    private IState _currentState;
+    private Authenticator _authenticator;
+
     public IInput Input {get;}
     public IOutput Output{get;}
     private List<ITokenSink> _sinks; 
-
+    public Authenticator GetAuthenticator()
+    {
+        return _authenticator;
+    }
     public void InitService()
     {
-        Authenticator authenticator = new Authenticator();
-        authenticator.AddUser("user1", "password1");
-        authenticator.AddUser("user2", "password2");
-        _currentState =_states[States.AUTH];
+        InitStates();
+        _authenticator = new Authenticator();
+        _authenticator.AddUser("user1", "password1");
+        _authenticator.AddUser("user2", "password2");
+        _currentState =_states[IService.States.AUTH];
     }
 
     
@@ -33,19 +31,19 @@ public class EchoService:IService
         this.Input = input;
         this.Output = output;
         this._sinks = sinks;
-        this._states = new Dictionary<States, IState>();
+        this._states = new Dictionary<IService.States, IState>();
     }
   public void InitStates()
     {
-        _states.Add(States.AUTH, new AuthenticatorState());
-        _states.Add(States.ECHO, new EchoState());
-        _states.Add(States.TOKEN, new LexerState(_sinks));
-        _states.Add(States.EXIT, new ExitState());
+        _states.Add(IService.States.AUTH, new AuthenticatorState());
+        _states.Add(IService.States.ECHO, new EchoState());
+        _states.Add(IService.States.TOKEN, new LexerState(_sinks));
+        _states.Add(IService.States.EXIT, new ExitState());
     }
 
     private void PrintPrompt(IState state)
     {
-        Output.Write(state.GetPrompt(), false);
+        Output.Write(state.GetPrompt()+ ">", false);
     }
     public void StartService()
     {
@@ -54,26 +52,16 @@ public class EchoService:IService
         {   
            PrintPrompt(_currentState);
             string inputText = Input.Read();
-            switch (inputText)
-            {
-                case "exit":
-                    _currentState = new ExitState();
-                    break;
-                case "logout":
-                    _currentState = new AuthenticatorState();
-                    break;
-                case "token":
-                    _currentState = new LexerState(_sinks);
-                    break;
-                case "echo":
-                    _currentState = new EchoState();
-                    break;
-                default:
-                    _currentState = _currentState.Handle(inputText, this);
-                    break;
-            }
+            _currentState.Handle(inputText, this);
+            SetState(inputText);
         }
     }
+
+    private void SetState(string inputText)
+    {
+        _currentState = _states[_currentState.GetNextState(inputText)];
+    }
+
 }
 public class ConsoleInput : IInput
 {

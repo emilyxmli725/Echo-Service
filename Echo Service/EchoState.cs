@@ -5,25 +5,58 @@ using System;
 using System.Collections.Generic;
 public class EchoState : IState
 {
-    public IState Handle(string inputString,EchoService echoService)
+    public void Handle(string inputString,EchoService echoService)
     {
         IOutput output = echoService.Output;
         output.Write( inputString, true);
-        return this; 
     }
 
     public string GetPrompt()
     {
         return "Echo"; 
     }
+    public IService.States GetNextState(string inputText)
+    {
+        if(inputText.Equals("logout",StringComparison.CurrentCultureIgnoreCase))
+        {
+            return IService.States.AUTH;
+        }
+
+        if (inputText.Equals("exit", StringComparison.CurrentCultureIgnoreCase))
+        {
+            return IService.States.EXIT;
+        }
+
+        if (inputText.Equals("token", StringComparison.CurrentCultureIgnoreCase))
+        {
+            return IService.States.TOKEN; 
+        }
+
+        return IService.States.ECHO; 
+    }
 }
 
 public class AuthenticatorState : IState
 {
+    private bool _authenticated = false;
     private string _username;
-    public IState Handle(string inputString,EchoService echoService)
+    public void Handle(string inputString,EchoService echoService)
     {
+        _authenticated = false;
         IOutput output = echoService.Output;
+        if (_username == null)
+        {
+            _username = inputString;
+        }
+        else
+        {
+            if (echoService.GetAuthenticator().CheckPassword(_username, inputString))
+            {
+                _authenticated = true;
+            }
+
+            _username = null; 
+        }
 
     }
 
@@ -38,14 +71,22 @@ public class AuthenticatorState : IState
             return "Pwd"; 
         }
     }
+
+    public IService.States GetNextState(string inputText)
+    {
+        return _authenticated ? IService.States.ECHO : IService.States.AUTH;
+    }
 }
 
 
 public class ExitState : IState
 {
-    public IState Handle(string inputText,EchoService echoService)
+    public void Handle(string inputText,EchoService echoService)
     {
-        return this; 
+    }
+    public IService.States GetNextState(string inputText)
+    {
+        return IService.States.EXIT;
     }
 
     public string GetPrompt()

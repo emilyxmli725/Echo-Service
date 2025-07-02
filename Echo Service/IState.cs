@@ -4,7 +4,8 @@ using System.Collections.Generic;
 public interface IState
 {
     void Handle(string inputText, EchoService echoService);
-    string GetPrompt(); 
+    string GetPrompt();
+    IService.States GetNextState(string inputText); 
 
 }
 

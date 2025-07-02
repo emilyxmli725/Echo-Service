@@ -17,12 +17,12 @@ public class LexerState :IState
         _tokenSinks = tokenSinks;
     }
     
-    public IState Handle(string inputText,EchoService echoService)
+    public void Handle(string inputText,EchoService echoService)
     {
         List<Token> tokens = Tokenize(inputText, echoService);
-        if (null ==tokens)
+        if (null == tokens)
         {
-            return this;
+            return ;
         }
         foreach (var token in tokens)
         {
@@ -43,14 +43,34 @@ public class LexerState :IState
         {
             sink.ClearTokens();
         }
-
-        return this; 
+        
     }
 
     public string GetPrompt()
     {
         return "Token";
     }
+
+    public IService.States GetNextState(string inputText)
+    {
+       if(inputText.Equals("logout",StringComparison.CurrentCultureIgnoreCase))
+       {
+           return IService.States.AUTH;
+       }
+
+       if (inputText.Equals("exit", StringComparison.CurrentCultureIgnoreCase))
+       {
+           return IService.States.EXIT;
+       }
+
+       if (inputText.Equals("echo", StringComparison.CurrentCultureIgnoreCase))
+       {
+           return IService.States.ECHO; 
+       }
+
+       return IService.States.TOKEN; 
+    }
+
 
     private List<Token> Tokenize(string inputText, EchoService echoService)
     {
